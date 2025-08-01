@@ -12,7 +12,7 @@ ARG CALENDSO_ENCRYPTION_KEY=secret
 ARG MAX_OLD_SPACE_SIZE=4096
 ARG NEXT_PUBLIC_API_V2_URL
 
-ENV NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER \
+ENV NEXT_PUBLIC_WEBAPP_URL=https://authentic-education-production.up.railway.app \
   NEXT_PUBLIC_API_V2_URL=$NEXT_PUBLIC_API_V2_URL \
   NEXT_PUBLIC_LICENSE_CONSENT=$NEXT_PUBLIC_LICENSE_CONSENT \
   NEXT_PUBLIC_WEBSITE_TERMS_URL=$NEXT_PUBLIC_WEBSITE_TERMS_URL \
@@ -59,10 +59,6 @@ COPY --from=builder /calcom/packages ./packages
 COPY --from=builder /calcom/apps/web ./apps/web
 COPY --from=builder /calcom/packages/prisma/schema.prisma ./prisma/schema.prisma
 COPY scripts scripts
-
-# Make the script executable and run it
-RUN chmod +x scripts/replace-placeholder.sh
-RUN scripts/replace-placeholder.sh http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER ${NEXT_PUBLIC_WEBAPP_URL}
 
 
 # Save value used during this build stage. If NEXT_PUBLIC_WEBAPP_URL and BUILT_NEXT_PUBLIC_WEBAPP_URL differ a
