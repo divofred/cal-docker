@@ -12,7 +12,7 @@ ARG CALENDSO_ENCRYPTION_KEY=5lcf1c2kloqred5mcu915nuzbpzzge34
 ARG MAX_OLD_SPACE_SIZE=4096
 ARG NEXT_PUBLIC_API_V2_URL
 
-ENV NEXT_PUBLIC_WEBAPP_URL=http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER \
+ENV NEXT_PUBLIC_WEBAPP_URL=https://cal-docker.onrender.com \
   NEXT_PUBLIC_API_V2_URL=$NEXT_PUBLIC_API_V2_URL \
   NEXT_PUBLIC_LICENSE_CONSENT=$NEXT_PUBLIC_LICENSE_CONSENT \
   NEXT_PUBLIC_WEBSITE_TERMS_URL=$NEXT_PUBLIC_WEBSITE_TERMS_URL \
@@ -47,7 +47,7 @@ RUN rm -rf node_modules/.cache .yarn/cache apps/web/.next/cache
 FROM node:18 AS builder-two
 
 WORKDIR /calcom
-ARG NEXT_PUBLIC_WEBAPP_URL=https://authentic-education-production.up.railway.app
+ARG NEXT_PUBLIC_WEBAPP_URL=https://cal-docker.onrender.com
 
 ENV NODE_ENV=production
 
@@ -61,8 +61,8 @@ COPY --from=builder /calcom/packages/prisma/schema.prisma ./prisma/schema.prisma
 COPY scripts scripts
 
 # Make the script executable and run it
-RUN chmod +x scripts/replace-placeholder.sh
-RUN scripts/replace-placeholder.sh http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER ${NEXT_PUBLIC_WEBAPP_URL}
+# RUN chmod +x scripts/replace-placeholder.sh
+# RUN scripts/replace-placeholder.sh http://NEXT_PUBLIC_WEBAPP_URL_PLACEHOLDER ${NEXT_PUBLIC_WEBAPP_URL}
 
 
 # Save value used during this build stage. If NEXT_PUBLIC_WEBAPP_URL and BUILT_NEXT_PUBLIC_WEBAPP_URL differ at
@@ -77,7 +77,9 @@ FROM node:18 AS runner
 
 WORKDIR /calcom
 COPY --from=builder-two /calcom ./
-ARG NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
+RUN chmod +x /calcom/scripts/start.sh
+
+ARG NEXT_PUBLIC_WEBAPP_URL=https://cal-docker.onrender.com
 ENV NEXT_PUBLIC_WEBAPP_URL=$NEXT_PUBLIC_WEBAPP_URL \
   BUILT_NEXT_PUBLIC_WEBAPP_URL=$NEXT_PUBLIC_WEBAPP_URL
 
@@ -85,6 +87,6 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=30s --retries=5 \
-  CMD wget --spider http://localhost:3000 || exit 1
+  CMD wget --spider https://cal-docker.onrender.com || exit 1
 
 CMD ["/calcom/scripts/start.sh"]
